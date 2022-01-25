@@ -1,5 +1,7 @@
 from crypt import methods
 from gc import callbacks
+import sqlite3
+import pandas as pd
 from flask import Flask, render_template, request #flask imports
 from flask_bootstrap import Bootstrap #bootstrap import
 import requests, json #currently unused
@@ -18,11 +20,24 @@ def hello():
 
 @app.route('/chat',methods=['GET','POST']) #the chat screen
 def chat():
+    conn = sqlite3.connect('user_db') #connect to the user database
+    c = conn.cursor()
     if request.form['username'] =='admin': #admin dashboard to see all users and chats
-        return render_template('admin.html')
+        c.execute('''SELECT * from users''')
+        data = c.fetchall()
+        return render_template('admin.html', db = data)
+    else:
+        c.execute('''SELECT username FROM users WHERE username = ?''',(request.form['username'],)) #check if user already exists
+        data = c.fetchall() 
+        if len(data) == 0: #if user doesnt exist in the db, insert them into db
+            c.execute('''INSERT INTO users (username)
+                VALUES
+                ('{username}')
+                '''.format(username=request.form['username']))
+            conn.commit() #save changes
     return render_template('chat.html', uname = request.form['username']) #if not admin, load chat.html and pass the username
 
-@SocketIO.on('message') 
+@SocketIO.on('message') #handles the actual messaging 
 def handle_message(data):
     print('received message: '+data)
     send(data,broadcast=True)

@@ -9,29 +9,37 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 
 <body>
-<script type="text/javascript" charset="utf-8">
-    var socket = io();
-    var uname = '{{uname}}' //get the username that was passed from home screen
-    socket.on('connect', function() {
-        socket.send(uname + ' has connected');
-        console.log('CONNECTED')
-    });
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
+        var uname = '{{uname}}' //get the username that was passed from home screen
+        socket.on('connect', function() {
+            socket.send('System: '+uname + ' has connected');
+            console.log('CONNECTED') //testing
+        });
 
-    socket.on('message',function(message){
-        $("#message_log").append('<li>'+message+'</li>');
-    });
+        socket.on('message',function(message){
+            $("#message_log").append('<li>'+message+'</li>');
+        });
 
-    function send(){
-        socket.send(uname + ': '+$('#message_input').val()); //send message
-        //console.log('message sent'); //testing
-        $('#message_input').val(''); //empty the text input
-    }
+        function send(){
+            socket.send(uname + ': '+$('#message_input').val()); //send message
+            console.log('message sent'); //testing
+            $('#message_input').val(''); //empty the text input
+        }
 
-</script>
+        function logout(){
+            socket.send('System: '+uname+' has disconnected')
+            console.log('DISCONNECTED') //testing
+        }
 
-<ul id="message_log"></ul>
-<input type="text" id="message_input">
-<button id="sendbutton" onclick="send()">Send</button>
-<p>{{uname}}</p>
+    </script>
+
+    <ul id="message_log" style="overflow: hidden; overflow-y: scroll; height: 200px;"></ul>
+    <input type="text" id="message_input" class="form-control">
+    <div class="btn-group">
+        <button id="sendbutton" onclick="send()" class="btn btn-success">Send Message</button>
+        <a href="/" class="btn btn-danger" onclick="logout()">Log Out</a>
+    </div>
+    
 </body>
 </html>
