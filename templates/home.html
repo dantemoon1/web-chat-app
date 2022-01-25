@@ -1,8 +1,22 @@
+{{ bootstrap.load_css() }}
+{{ bootstrap.load_js() }}
 <html>
 <head>
-    <title>Session</title>
+    <title>Ezoic Chat</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-    <p>Hello</p>
+
+
+<body class="text-center">
+    <form action="{{url_for('chat')}}" method = "post">
+        <div class = "form-group">
+            <h1>Welcome to Ezoic Chat!</h1>
+            <h2>Please sign in</h2>
+            <img src="static/ezoic.jpg" alt="ezoic logo" style="width: 128px; height: 128px;">
+            <input type = "text" id="username" name="username" class="form-control", placeholder="Username" style="width: 250px;margin-left: auto;margin-right: auto;margin-top: 20px;" required><br>
+            <button type="submit" class="btn btn-success">Sign In</button>
+        </div>
+    </form>
 </body>
+
 </html>
