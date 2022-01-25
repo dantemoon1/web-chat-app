@@ -1,8 +1,9 @@
 from crypt import methods
+from gc import callbacks
 from flask import Flask, render_template, request #flask imports
 from flask_bootstrap import Bootstrap #bootstrap import
 import requests, json #currently unused
-from flask_socketio import SocketIO #used to connect users for chat
+from flask_socketio import SocketIO, send, emit #used to connect users for chat
 
 app = Flask(__name__)
 import os
@@ -17,8 +18,16 @@ def hello():
 
 @app.route('/chat',methods=['GET','POST']) #the chat screen
 def chat():
-    return request.form['username']
+    if request.form['username'] =='admin': #admin dashboard to see all users and chats
+        return render_template('admin.html')
+    return render_template('chat.html', uname = request.form['username']) #if not admin, load chat.html and pass the username
+
+@SocketIO.on('message') 
+def handle_message(data):
+    print('received message: '+data)
+    send(data,broadcast=True)
 
 if __name__ == '__main__':
     app.debug= True
-    app.run(host='0.0.0.0',port=5000)
+    socketio.run(app)
+    #app.run(host='0.0.0.0',port=5000)
