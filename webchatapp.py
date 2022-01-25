@@ -1,10 +1,8 @@
 from crypt import methods
 from gc import callbacks
 import sqlite3
-import pandas as pd
 from flask import Flask, render_template, request #flask imports
 from flask_bootstrap import Bootstrap #bootstrap import
-import requests, json #currently unused
 from flask_socketio import SocketIO, send, emit #used to connect users for chat
 
 app = Flask(__name__)
@@ -25,7 +23,7 @@ def chat():
     if request.form['username'] =='admin': #admin dashboard to see all users and chats
         c.execute('''SELECT * from users''')
         data = c.fetchall()
-        return render_template('admin.html', db = data)
+        return render_template('admin.html', db = data) #pass the database of users
     else:
         c.execute('''SELECT username FROM users WHERE username = ?''',(request.form['username'],)) #check if user already exists
         data = c.fetchall() 

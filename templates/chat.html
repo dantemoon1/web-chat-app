@@ -12,13 +12,13 @@
     <script type="text/javascript" charset="utf-8">
         var socket = io();
         var uname = '{{uname}}' //get the username that was passed from home screen
-        socket.on('connect', function() {
+        socket.on('connect', function() { //when a user connects, send a message
             socket.send('System: '+uname + ' has connected');
-            console.log('CONNECTED') //testing
-        });
+            //console.log('CONNECTED') //testing
+        }); //taken from flask socketio documentation
 
-        socket.on('message',function(message){
-            $("#message_log").append('<li>'+message+'</li>');
+        socket.on('message',function(message){ //messaging
+            $("#message_log").append('<li>'+message+'</li>'); //append the message to the list
         });
 
         function send(){
@@ -28,8 +28,8 @@
         }
 
         function logout(){
-            socket.send('System: '+uname+' has disconnected')
-            console.log('DISCONNECTED') //testing
+            socket.send('System: '+uname+' has disconnected');
+            //console.log('DISCONNECTED') //testing
         }
 
     </script>
