@@ -18,11 +18,28 @@
         }); //taken from flask socketio documentation
 
         socket.on('message',function(message){ //messaging
-            $("#message_log").append('<li>'+message+'</li>'); //append the message to the list
+            var uname = '{{uname}}'; //store current username
+            if(message.includes('@'+uname)){ //if the message text includes @username
+                console.log('direct message');
+                //var nametext = message.substring(0,uname.length)
+                $("#message_log").append('<li>'+message.bold()+'</li>');
+            } else {
+                $("#message_log").append('<li>'+message+'</li>'); //append the message to the list
+            }
         });
 
+        var date = new Date()
+        
+        var dateAndTime = (date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear() + ' at: ' + date.getHours() + ':' + date.getMinutes();
+        console.log(dateAndTime) 
+
+        //var obj = JSON.parse("{{messageData|safe}}".replace("'",'"'));
+        //console.log(obj);
+        //console.log(typeof('{{messageData}}'))
+        //console.log('{{messageData|tojson|safe}}')
+
         function send(){
-            socket.send(uname + ': '+$('#message_input').val()); //send message
+            socket.send(uname + ': '+$('#message_input').val()+' sent at:'+dateAndTime); //send message
             console.log('message sent'); //testing
             $('#message_input').val(''); //empty the text input
         }
@@ -35,6 +52,10 @@
     </script>
 
     <ul id="message_log" style="overflow: hidden; overflow-y: scroll; height: 200px;"></ul>
+    <script>
+        var messageData = JSON.parse('{{messageData|tojson|safe}}');
+        messageData.forEach(element => $("#message_log").append('<li>'+element+'</li>'));
+    </script>
     <input type="text" id="message_input" class="form-control">
     <div class="btn-group">
         <button id="sendbutton" onclick="send()" class="btn btn-success">Send Message</button>

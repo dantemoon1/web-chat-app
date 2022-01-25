@@ -4,6 +4,7 @@ import sqlite3
 from flask import Flask, render_template, request #flask imports
 from flask_bootstrap import Bootstrap #bootstrap import
 from flask_socketio import SocketIO, send, emit #used to connect users for chat
+import json
 
 app = Flask(__name__)
 import os
@@ -20,10 +21,15 @@ def hello():
 def chat():
     conn = sqlite3.connect('user_db') #connect to the user database
     c = conn.cursor()
+    c.execute('''SELECT * from messages''')
+    messageData = c.fetchall()
+    messageList = []
+    for i in range(len(messageData)):
+        messageList.append(messageData[i][0])
     if request.form['username'] =='admin': #admin dashboard to see all users and chats
         c.execute('''SELECT * from users''')
         data = c.fetchall()
-        return render_template('admin.html', db = data) #pass the database of users
+        return render_template('admin.html', db = data, messageData = messageList) #pass the database of users
     else:
         c.execute('''SELECT username FROM users WHERE username = ?''',(request.form['username'],)) #check if user already exists
         data = c.fetchall() 
@@ -33,10 +39,16 @@ def chat():
                 ('{username}')
                 '''.format(username=request.form['username']))
             conn.commit() #save changes
-    return render_template('chat.html', uname = request.form['username']) #if not admin, load chat.html and pass the username
+    return render_template('chat.html', uname = request.form['username'], messageData = messageList) #if not admin, load chat.html and pass the username
 
 @SocketIO.on('message') #handles the actual messaging 
 def handle_message(data):
+    conn = sqlite3.connect('user_db')
+    c = conn.cursor()
+    c.execute('''INSERT INTO messages (message)
+    VALUES
+    ('{message}')'''.format(message=data))
+    conn.commit()
     print('received message: '+data)
     send(data,broadcast=True)
 
